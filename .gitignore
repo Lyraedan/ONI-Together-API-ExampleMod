@@ -1,0 +1,4 @@
+bin/
+obj/
+*.user
+Directory.Build.props.user

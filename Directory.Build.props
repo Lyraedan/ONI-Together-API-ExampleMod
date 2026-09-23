@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Defaults for the example mod. To point at your own install, copy this file to
+  Directory.Build.props.user and adjust the paths (the .user file wins).
+-->
+<Project>
+
+  <Import Condition="Exists('Directory.Build.props.user')" Project="Directory.Build.props.user" />
+
+  <PropertyGroup>
+    <!-- ONI Managed folder -->
+    <GameLibsFolder Condition="'$(GameLibsFolder)' == ''">/home/luke/.steam/debian-installation/steamapps/common/OxygenNotIncluded/OxygenNotIncluded_Data/Managed</GameLibsFolder>
+
+    <!-- Dev mod folder the build deploys into -->
+    <ModFolder Condition="'$(ModFolder)' == ''">/home/luke/.config/unity3d/Klei/Oxygen Not Included/mods/Dev</ModFolder>
+
+    <!-- The self-contained ONI Together API dll (Release build). -->
+    <ApiDllPath Condition="'$(ApiDllPath)' == ''">/home/luke/Documents/GitHub/Oxygen_Not_Included_Together/ONI_Together_API/bin/Release/netstandard2.1/ONI_Together_API.dll</ApiDllPath>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>ExampleMod</AssemblyName>
+    <RootNamespace>ExampleMod</RootNamespace>
+    <Optimize Condition="'$(Configuration)' == 'Release'">true</Optimize>
+    <Optimize Condition="'$(Configuration)' == 'Debug'">false</Optimize>
+
+    <!-- Mod metadata consumed by Directory.Build.targets to generate the yaml files -->
+    <ModName>ONI Together API Example Mod</ModName>
+    <ModDescription>Example third-party mod demonstrating the ONI Together API: packets, session info, and OxySync.</ModDescription>
+    <TargetGameVersion>736649</TargetGameVersion>
+
+    <!-- Do not ILRepack: the API dll is shipped alongside this mod so it can load standalone. -->
+    <DoNotBuildAsMod>false</DoNotBuildAsMod>
+    <IsPacked>false</IsPacked>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The ONI Together API. Built as a self-contained (ILRepacked) Release dll. -->
+    <Reference Include="ONI_Together_API">
+      <HintPath>$(ApiDllPath)</HintPath>
+      <Private>true</Private>
+    </Reference>
+
+    <!-- Publicized game assemblies (everything public). -->
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(GameLibsFolder)/Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(GameLibsFolder)/Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Harmony for UserMod2.OnLoad. -->
+    <Reference Include="0Harmony">
+      <HintPath>$(GameLibsFolder)/0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- Unity assemblies used by the example. -->
+    <Reference Include="UnityEngine">
+      <HintPath>$(GameLibsFolder)/UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(GameLibsFolder)/UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(GameLibsFolder)/UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

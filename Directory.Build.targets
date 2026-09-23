@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+
+  <!-- Write mod.yaml -->
+  <Target Name="GenerateModYaml" BeforeTargets="PrepareForRun" Condition="'$(DoNotBuildAsMod)' != 'true'">
+    <ItemGroup>
+      <ModLines Include="title: '$(ModName)'" />
+      <ModLines Include="description: &quot;$([System.String]::Copy('$(ModDescription)').Replace('&quot;', '\&quot;'))&quot;" />
+      <ModLines Include="staticID: $(AssemblyName)" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(TargetDir)/mod.yaml" Overwrite="true" Lines="@(ModLines)" />
+    <ItemGroup>
+      <FileWrites Include="$(TargetDir)/mod.yaml" Condition="Exists('$(TargetDir)/mod.yaml')" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Write mod_info.yaml -->
+  <Target Name="GenerateModInfoYaml" BeforeTargets="PrepareForRun" Condition="'$(DoNotBuildAsMod)' != 'true'">
+    <ItemGroup>
+      <ModInfoLines Include="minimumSupportedBuild: $(TargetGameVersion)" />
+      <ModInfoLines Include="version: 1.0.0" />
+      <ModInfoLines Include="APIVersion: 2" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(TargetDir)/mod_info.yaml" Overwrite="true" Lines="@(ModInfoLines)" />
+    <ItemGroup>
+      <FileWrites Include="$(TargetDir)/mod_info.yaml" Condition="Exists('$(TargetDir)/mod_info.yaml')" />
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup>
+    <TargetFolder>$([System.IO.Path]::GetFullPath('$(ModFolder)\$(TargetName)_dev'))</TargetFolder>
+  </PropertyGroup>
+
+  <!-- Copy dll, pdb, yaml files and the API dll into the dev mod folder. -->
+  <Target Name="CopyModsToDevFolder" AfterTargets="Build" Condition="'$(DoNotBuildAsMod)' != 'true'">
+    <Message Text="Deploying $(AssemblyName) to $(TargetFolder)" Importance="High" />
+    <MakeDir Directories="$(TargetFolder)" />
+    <Copy
+      SourceFiles="$(TargetDir)$(TargetName).dll;$(TargetDir)$(TargetName).pdb;$(TargetDir)mod.yaml;$(TargetDir)mod_info.yaml;$(ApiDllPath)"
+      DestinationFolder="$(TargetFolder)" />
+    <Message Text="Deployed example mod" Importance="High" />
+  </Target>
+
+</Project>

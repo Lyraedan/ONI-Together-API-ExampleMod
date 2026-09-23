@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy this file to Directory.Build.props.user and adjust the three paths for your machine.
+  Directory.Build.props.user is gitignored.
+-->
+<Project>
+  <PropertyGroup>
+    <!-- Your ONI Managed folder -->
+    <GameLibsFolder>/home/luke/.steam/debian-installation/steamapps/common/OxygenNotIncluded/OxygenNotIncluded_Data/Managed</GameLibsFolder>
+
+    <!-- Your ONI dev mods folder -->
+    <ModFolder>/home/luke/.config/unity3d/Klei/Oxygen Not Included/mods/Dev</ModFolder>
+
+    <!-- Path to a Release-built, self-contained ONI_Together_API.dll -->
+    <ApiDllPath>/home/luke/Documents/GitHub/Oxygen_Not_Included_Together/ONI_Together_API/bin/Release/netstandard2.1/ONI_Together_API.dll</ApiDllPath>
+  </PropertyGroup>
+</Project>
