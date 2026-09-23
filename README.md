@@ -14,7 +14,7 @@ packets, session info, and an OxySync `NetworkBehaviour`.
 | `src/Networking/PacketExamples.cs` | Every `PacketSenderAPI` overload + `SessionInfoAPI` gating/querying |
 | `src/OxySync/ExampleSyncBehaviour.cs` | `[SyncVar]` (+ hook / epsilon / send-mode), `[Command]`, `[ClientRpc]`, `[TargetRpc]`, `[Server]`/`[Client]` |
 | `src/OxySync/ExampleSyncSpawner.cs` | Spawning/removing a synced entity and assigning a NetId via `NetIdentityHelper` |
-| `src/World/EntityExamples.cs` | `SpawnUtilsAPI.KNetInstantiate` (prefab + element) and `NetworkIdentityRegistryAPI` lookups |
+| `src/World/EntityExamples.cs` | `SpawnUtilsAPI.KNetInstantiate` (prefab + element), `NetIdentityHelper` NetId helpers, and `NetworkIdentityRegistryAPI` lookups |
 
 ## In-game hotkeys
 
@@ -74,12 +74,20 @@ GameObject ore = EntityExamples.SpawnResource(SimHashes.IronOre, position, 100f,
 > prefab at that z places it at the wrong depth (often invisible). `SpawnResource` already snaps
 > internally.
 
-To query an entity later you need its **NetId**, but neither API exposes one. Use
-`NetIdentityHelper.AddOrGetNetId(go)`, which returns the NetId `KNetInstantiate` already assigned:
+To query an entity later you need its **NetId**. `Shared.Helpers.NetIdentityHelper` exposes three
+helpers for that:
+
+| Method | Behaviour |
+| --- | --- |
+| `AddNetId(go)` | Adds a network identity if the object lacks one, registers it if it has no id, and returns the NetId. |
+| `GetNetId(go)` | Read-only: returns the object's existing NetId, or `0` if it has none. Never creates/registers. |
+| `AddOrGetNetId(go, preferredId = 0)` | Combines the two; a non-zero `preferredId` overrides the assigned id. |
+
+`KNetInstantiate` already assigns an identity, so read it back with `GetNetId`:
 
 ```csharp
 GameObject go = EntityExamples.SpawnResource(SimHashes.IronOre, position, 100f, 293.15f);
-int netId = NetIdentityHelper.AddOrGetNetId(go);
+int netId = NetIdentityHelper.GetNetId(go);
 
 if (NetworkIdentityRegistryAPI.TryGet(netId, out GameObject found))
     Debug.Log($"Found {found.name}");
@@ -87,6 +95,21 @@ if (NetworkIdentityRegistryAPI.TryGet(netId, out GameObject found))
 if (NetworkIdentityRegistryAPI.TryGetComponent<PrimaryElement>(netId, out var primaryElement))
     Debug.Log($"{primaryElement.ElementID}: {primaryElement.Mass}kg");
 ```
+
+For a GameObject you created yourself, call `AddNetId` first; `GetNetId` alone will return `0`
+because no identity exists yet:
+
+```csharp
+var go = new GameObject("MySyncedThing");
+int netId = NetIdentityHelper.AddNetId(go);        // assign + register
+// ... later ...
+int again = NetIdentityHelper.GetNetId(go);        // same id, no side effects
+
+// Or honour a preferred/deterministic id:
+int preferred = NetIdentityHelper.AddOrGetNetId(go, 12345);
+```
+
+`EntityExamples.EnsureNetId` / `EntityExamples.ReadNetId` wrap these calls with logging.
 
 `EntityExamples.SpawnResourceAndInspect(...)` performs that whole spawn → NetId → lookup loop in one
 call. The `F5`/`F6`/`F7` hotkeys run the prefab spawn, the element spawn, and the registry lookup
@@ -177,7 +200,8 @@ the main mod's own copy; the main mod discovers and bridges each consuming mod's
 This works as long as ONI Together is present. If ONI Together is absent, OxySync calls are inert.
 
 `NetworkIdentity` belongs to the main mod and is **not** part of the API surface — don't add it
-directly. Use `Shared.Helpers.NetIdentityHelper.AddOrGetNetId(gameObject)` to assign a NetId.
+directly. Use `Shared.Helpers.NetIdentityHelper.AddNetId(gameObject)` to assign a NetId,
+`GetNetId(gameObject)` to read one, or `AddOrGetNetId(gameObject, preferredId)` for both.
 
 ## Limitations
 

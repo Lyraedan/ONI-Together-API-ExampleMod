@@ -32,8 +32,8 @@ namespace ExampleMod.OxySync
             var go = new GameObject("ExampleMod_SyncEntity");
             Object.DontDestroyOnLoad(go);
 
-            // Assign a deterministic/shared NetId for this object via the API helper.
-            int netId = NetIdentityHelper.AddOrGetNetId(go);
+            // Ensure this object has a network identity and read its assigned NetId.
+            int netId = NetIdentityHelper.AddNetId(go);
 
             var behaviour = go.AddComponent<ExampleSyncBehaviour>();
             _instance = behaviour;

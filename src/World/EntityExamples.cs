@@ -14,9 +14,10 @@ namespace ExampleMod.World
     /// automatically replicates it to every client. On a client (or when ONI Together is absent) it
     /// returns <c>null</c>.
     ///
-    /// There is no API to read a NetId back out of the registry, but <see cref="NetIdentityHelper"/>
-    /// returns the NetId that <c>KNetInstantiate</c> assigned, which is exactly what the registry
-    /// lookup methods expect.
+    /// The registry only maps NetId -> entity, so to query an entity you need its NetId.
+    /// <see cref="NetIdentityHelper"/> provides that: <c>AddNetId</c> ensures an entity has one,
+    /// <c>GetNetId</c> reads an existing one without side effects, and <c>AddOrGetNetId</c> combines
+    /// the two (optionally honouring a preferred id). All three return the id the registry expects.
     /// </summary>
     public static class EntityExamples
     {
@@ -125,6 +126,46 @@ namespace ExampleMod.World
             return found;
         }
 
+        // NetId helpers
+
+        /// <summary>
+        /// Ensures a GameObject has a network identity and returns its NetId, adding/registering one
+        /// if needed. Use this for objects you create yourself that aren't spawned via
+        /// <see cref="SpawnUtilsAPI"/> (which already assigns an identity).
+        /// </summary>
+        /// <param name="go">The GameObject to give a NetId.</param>
+        /// <returns>The assigned NetId, or <c>0</c> if ONI Together is not loaded.</returns>
+        public static int EnsureNetId(GameObject go)
+        {
+            int netId = NetIdentityHelper.AddNetId(go);
+            Debug.Log($"[ExampleMod] '{go.name}' now has NetId {netId}");
+            return netId;
+        }
+
+        /// <summary>
+        /// Reads the NetId already assigned to a GameObject, without creating or registering an
+        /// identity. Returns <c>0</c> if the object has none.
+        /// </summary>
+        /// <param name="go">The GameObject to read.</param>
+        /// <returns>The existing NetId, or <c>0</c> if there is none.</returns>
+        public static int ReadNetId(GameObject go)
+        {
+            int netId = NetIdentityHelper.GetNetId(go);
+            Debug.Log($"[ExampleMod] '{go.name}' NetId = {netId}");
+            return netId;
+        }
+
+        /// <summary>
+        /// Reuses or assigns a NetId with a preferred value (e.g. a deterministic id the host chose).
+        /// A <paramref name="preferredId"/> of <c>0</c> behaves like <see cref="EnsureNetId"/>.
+        /// </summary>
+        public static int EnsureNetId(GameObject go, int preferredId)
+        {
+            int netId = NetIdentityHelper.AddOrGetNetId(go, preferredId);
+            Debug.Log($"[ExampleMod] '{go.name}' NetId = {netId} (preferred {preferredId})");
+            return netId;
+        }
+
         // Combined: spawn, resolve the NetId, then read it back through the registry.
 
         /// <summary>
@@ -137,8 +178,9 @@ namespace ExampleMod.World
             if (go == null)
                 return;
 
-            // KNetInstantiate already registered a NetworkIdentity; AddOrGetNetId returns it.
-            int netId = NetIdentityHelper.AddOrGetNetId(go);
+            // KNetInstantiate already registered a NetworkIdentity, so GetNetId reads it back
+            // without any side effects.
+            int netId = NetIdentityHelper.GetNetId(go);
             Debug.Log($"[ExampleMod] Spawned entity NetId = {netId}");
 
             // Query it straight back out of the registry, by NetId.
