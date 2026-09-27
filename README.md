@@ -3,19 +3,6 @@
 A minimal, buildable third-party mod demonstrating the **ONI Together API**: custom network
 packets, session info, and an OxySync `NetworkBehaviour`.
 
-## What it demonstrates
-
-| File | Shows |
-| --- | --- |
-| `src/ExampleMod.cs` | `UserMod2` entry point, detection via `MP_Mod_Info.MultiplayerModPresent`, packet registration via `PacketRegistryAPI.AutoRegisterAll` |
-| `src/ExampleModController.cs` | A persistent `MonoBehaviour` that drives the examples via hotkeys |
-| `src/Networking/ExampleHelloPacket.cs` | A reliable packet using the host-rebroadcast relay pattern |
-| `src/Networking/ExamplePingPacket.cs` | An unreliable, high-frequency packet (cell + colour) |
-| `src/Networking/PacketExamples.cs` | Every `PacketSenderAPI` overload + `SessionInfoAPI` gating/querying |
-| `src/OxySync/ExampleSyncBehaviour.cs` | `[SyncVar]` (+ hook / epsilon / send-mode), `[Command]`, `[ClientRpc]`, `[TargetRpc]`, `[Server]`/`[Client]` |
-| `src/OxySync/ExampleSyncSpawner.cs` | Spawning/removing a synced entity and assigning a NetId via `NetIdentityHelper` |
-| `src/World/EntityExamples.cs` | `SpawnUtilsAPI.KNetInstantiate` (prefab + element), `NetIdentityHelper` NetId helpers, and `NetworkIdentityRegistryAPI` lookups |
-
 ## In-game hotkeys
 
 The controller only reacts while in a multiplayer session (`SessionInfoAPI.InSession`).
